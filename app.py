@@ -1,5 +1,11 @@
 from flask import Flask, render_template, jsonify, redirect, url_for
-import sqlite3
+try:
+    import pysqlite3 as sqlite3
+    import sys
+    sys.modules["sqlite3"] = sqlite3
+except ImportError:
+    import sqlite3
+# import sqlite3
 import pandas as pd
 import json
 import os
