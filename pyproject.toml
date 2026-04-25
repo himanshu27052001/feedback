@@ -7,7 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "pandas>=2.2.0",
     "flask>=3.0.0",
-    "pysqlite3-binary>=2.6.0"
+    "pysqlite3-binary"
 ]
 
 [dependency-groups]
