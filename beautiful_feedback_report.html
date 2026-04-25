@@ -1,0 +1,289 @@
+
+<style>
+  :root {
+    --color-background-primary: #ffffff;
+    --color-background-secondary: #f8fafc;
+    --color-background-card: #ffffff;
+    --color-border-primary: #e2e8f0;
+    --color-border-secondary: #cbd5e1;
+    --color-text-primary: #0f172a;
+    --color-text-secondary: #475569;
+    --color-text-tertiary: #94a3b8;
+    --color-accent: #2563eb;
+    --border-radius-sm: 6px;
+    --border-radius-md: 10px;
+    --border-radius-lg: 16px;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-background-primary: #0f172a;
+      --color-background-secondary: #1e293b;
+      --color-background-card: #1e293b;
+      --color-border-primary: #334155;
+      --color-border-secondary: #475569;
+      --color-text-primary: #f8fafc;
+      --color-text-secondary: #cbd5e1;
+      --color-text-tertiary: #64748b;
+      --color-accent: #3b82f6;
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { 
+    background-color: var(--color-background-primary); 
+    color: var(--color-text-primary);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    line-height: 1.5;
+  }
+  .report { 
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: 100vh;
+  }
+
+  .nav-btn { 
+    padding: 8px 18px; 
+    border-radius: var(--border-radius-md); 
+    background: var(--color-background-card); 
+    color: var(--color-text-secondary); 
+    text-decoration: none; 
+    font-size: 14px; 
+    font-weight: 600; 
+    border: 1px solid var(--color-border-primary); 
+    transition: all 0.2s; 
+  }
+  .nav-btn:hover { border-color: var(--color-accent); color: var(--color-accent); }
+  .nav-btn.active { background: var(--color-accent); color: white; border-color: var(--color-accent); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+
+  .header { margin-bottom: 2.5rem; }
+  .title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .title { 
+    font-size: 32px; 
+    font-weight: 850; 
+    letter-spacing: -0.03em; 
+    margin: 0; 
+    background: linear-gradient(to right, var(--color-accent), #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .status-badge {
+    background: #fef2f2;
+    color: #ef4444;
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid #fee2e2;
+  }
+  .status-dot { width: 6px; height: 6px; background: #ef4444; border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+  .subtitle { font-size: 15px; color: var(--color-text-secondary); max-width: 800px; line-height: 1.5; margin: 0; }
+
+  @media(prefers-color-scheme:dark){
+    .status-badge { background: #450a0a; color: #fecaca; border-color: #7f1d1d; }
+    
+    .chapter.priority-1 { background: #064e3b; border-color: #065f46; }
+    .chapter.priority-1 .ch-title { color: #d1fae5; border-color: #34d399; }
+    .chapter.priority-1 .ch-body { color: #a7f3d0; }
+    .chapter.priority-1 .ch-num { color: #34d399; }
+
+    .chapter.priority-2 { background: #7c2d12; border-color: #9a3412; }
+    .chapter.priority-2 .ch-title { color: #ffedd5; border-color: #fb923c; }
+    .chapter.priority-2 .ch-body { color: #fed7aa; }
+    .chapter.priority-2 .ch-num { color: #fb923c; }
+  }
+
+  .nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 2rem; border-bottom: 1px solid var(--color-border-primary); padding-bottom: 1rem; }
+  .nb { 
+    padding: 8px 18px; 
+    border-radius: var(--border-radius-md); 
+    border: 1px solid transparent; 
+    font-size: 14px; 
+    font-weight: 600;
+    cursor: pointer; 
+    background: transparent; 
+    color: var(--color-text-secondary);
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .nb:hover { color: var(--color-accent); }
+  .nb.on { background: var(--color-background-secondary); color: var(--color-accent); border-color: var(--color-border-primary); }
+
+  .chapter { margin-bottom: 3rem; background: var(--color-background-card); padding: 2rem; border-radius: var(--border-radius-lg); border: 1px solid var(--color-border-primary); box-shadow: var(--shadow-sm); }
+  .ch-num { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--color-accent); margin-bottom: 0.5rem; }
+  .ch-title { font-size: 20px; font-weight: 700; color: var(--color-text-primary); margin-bottom: 1rem; padding-left: 10px; border-left: 4px solid var(--color-accent); }
+  .ch-body { font-size: 15px; color: var(--color-text-secondary); line-height: 1.6; }
+
+  .chapter.priority-1 { background: #f0fdf4; border-color: #bbf7d0; }
+  .chapter.priority-1 .ch-title { color: #166534; border-color: #166534; }
+  .chapter.priority-1 .ch-body { color: #166534; }
+  .chapter.priority-1 .ch-num { color: #15803d; }
+
+  .chapter.priority-2 { background: #fff7ed; border-color: #fed7aa; }
+  .chapter.priority-2 .ch-title { color: #9a3412; border-color: #9a3412; }
+  .chapter.priority-2 .ch-body { color: #9a3412; }
+  .chapter.priority-2 .ch-num { color: #c2410c; }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 2rem; }
+  .kpi { background: var(--color-background-card); border-radius: var(--border-radius-lg); padding: 1.5rem; border: 1px solid var(--color-border-primary); box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
+  .kpi-label { font-size: 12px; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: .05em; font-weight: 600; margin-bottom: 0.5rem; }
+  .kpi-val { font-size: 32px; font-weight: 800; color: var(--color-text-primary); }
+  .kpi-sub { font-size: 13px; color: var(--color-text-tertiary); margin-top: 4px; }
+
+  .callout { padding: 1.25rem; border-radius: var(--border-radius-md); margin: 1.5rem 0; font-size: 14px; line-height: 1.6; border: 1px solid transparent; }
+  .callout.success { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2); color: #059669; }
+  .callout.warn { background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2); color: #d97706; }
+
+  .t-card { background: var(--color-background-card); border: 1px solid var(--color-border-primary); border-radius: var(--border-radius-lg); padding: 1.5rem; box-shadow: var(--shadow-sm); margin-bottom: 1rem; }
+  .pnl { display: none; }
+  .pnl.on { display: block; animation: fadeIn 0.3s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+</style>
+
+<div class="report">
+
+<header class="header" style="display:flex; justify-content: space-between; align-items: flex-start;">
+  <div>
+    <div class="title-row">
+      <h1 class="title">Student Feedback Storyline</h1>
+      <div class="status-badge"><span class="status-dot"></span>Deep Dive</div>
+    </div>
+    <p class="subtitle">What 503 students told us about their learning experience. Narrative deep analysis.</p>
+  </div>
+  <div class="nav-links" style="display:flex; gap:8px; margin-top: 4px;">
+    <a href="/report" class="nav-btn active">Insight Report</a>
+    <a href="/full" class="nav-btn">Dashboard</a>
+  </div>
+</header>
+
+<div class="nav">
+  <button class="nb on" onclick="sw('p0',this)">Strategic Summary</button>
+  <button class="nb" onclick="sw('p1',this)">Faculty Analysis</button>
+  <button class="nb" onclick="sw('p2',this)">Initiatives Plan</button>
+</div>
+
+<div id="p0" class="pnl on">
+  <div class="chapter">
+    <div class="ch-num">chapter one</div>
+    <div class="ch-title">The overall health of the institute</div>
+    <div class="ch-body">
+      Across 503 students and 9,589 individual ratings, the institute scores <strong>4.01 out of 5</strong> — a solidly good result that reflects genuine student satisfaction. Nearly half of all ratings were a perfect 5 stars. The majority of teachers are doing meaningful work that students notice and appreciate.
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">vibe</div><div class="kpi-val">4.06</div><div class="kpi-sub">Overall positivity</div></div>
+    <div class="kpi"><div class="kpi-label">approachability</div><div class="kpi-val">4.05</div><div class="kpi-sub">Doubt resolution</div></div>
+    <div class="kpi"><div class="kpi-label">engagement</div><div class="kpi-val">3.93</div><div class="kpi-sub">Critical area</div></div>
+    <div class="kpi" style="background:var(--color-background-secondary);"><div class="kpi-label">net score</div><div class="kpi-val">4.01</div><div class="kpi-sub">Institute weighted avg</div></div>
+  </div>
+
+  <div class="callout success">
+    <strong>Key Performance:</strong> The Chemistry and Maths departments show exceptional vibe scores above 4.4, indicating students feel highly comfortable and motivated in these core sessions.
+  </div>
+</div>
+
+<div id="p1" class="pnl">
+  <div class="chapter">
+    <div class="ch-num">chapter two</div>
+    <div class="ch-title">The profiles of our educators</div>
+    <div class="ch-body">
+      Every teacher brings a unique style to the classroom. Our analysis identifies the performance narratives of each educator.
+    </div>
+  </div>
+  <div id="teacher-stories" class="grid-2"></div>
+</div>
+
+<div id="p2" class="pnl">
+  <div class="chapter">
+    <div class="ch-num">final chapter</div>
+    <div class="ch-title">Strategy for Q2 Improvement</div>
+    <div class="ch-body">
+      Based on the 503 student voices, we have identified primary areas for the next academic quarter.
+    </div>
+  </div>
+
+  <div class="chapter priority-1">
+    <div class="ch-num">priority #1</div>
+    <div class="ch-title">Boosting Classroom Engagement</div>
+    <div class="ch-body">
+      With an average score of 3.93, engagement is our lowest dimension. We will focus on interactive learning tools to push this metric past the 4.15 target.
+    </div>
+  </div>
+
+  <div class="chapter priority-2">
+    <div class="ch-num">priority #2</div>
+    <div class="ch-title">Standardizing Doubt Resolution</div>
+    <div class="ch-body">
+      While overall approachability is high, consistency varies across batches. Peer review sessions will help standardize the doubt-solving experience for all students.
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const batches = {{ batches | tojson | safe }};
+const batchN = {{ batchN | tojson | safe }};
+const teachers = {{ teachers | tojson | safe }};
+const data = {{ data | tojson | safe }};
+const infraData = {{ infraData | tojson | safe }};
+const TS = {{ TS | tojson | safe }};
+const BATCHES = batches;
+const BN = batchN;
+const BS = {{ batchScores | tojson | safe }};
+const INFRA = infraData;
+const timingData = {{ timing | tojson | safe }};
+const mentorData = {{ mentorData | tojson | safe }};
+const summaryData = {{ summary | tojson | safe }};
+
+function ov(d){return d?((d.v+d.a+d.e)/3):null;}
+
+function getStory(t){
+  if(t.ov >= 4.3) return `${t.n} is a clear favorite in ${t.s}. With a ${t.pp.toFixed(0)}% promoter rate, they are setting the benchmark for teaching excellence.`;
+  if(t.ov >= 4.0) return `${t.n} maintains a very strong performance in ${t.s}. Students appreciate their approachability and consistent vibe in the classroom.`;
+  if(t.ov >= 3.5) return `${t.n} is performing well but has room to grow in engagement. Students find them helpful, but more interactive sessions could boost scores.`;
+  return `${t.n} is currently facing challenges in student engagement. Focused mentorship and classroom management support could help improve their impact.`;
+}
+
+function renderTeachers(){
+  const container=document.getElementById('teacher-stories');
+  if(!container) return;
+  container.innerHTML='';
+  [...TS].sort((a,b)=>b.ov-a.ov).forEach(t=>{
+    container.innerHTML+=`<div class="t-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+        <div><h3 style="font-size:16px;font-weight:800;">${t.n}</h3><p style="font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;">${t.s}</p></div>
+        <div style="text-align:right;"><p style="font-size:22px;font-weight:900;color:var(--color-accent);">${t.ov.toFixed(2)}</p></div>
+      </div>
+      <p style="font-size:13px;color:var(--color-text-secondary);line-height:1.6;font-style:italic;min-height:4.8em;">"${getStory(t)}"</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:1rem;text-align:center;">
+        <div style="background:var(--color-background-secondary);padding:8px;border-radius:6px;"><p style="font-size:10px;color:var(--color-text-tertiary);">Vibe</p><p style="font-weight:700;font-size:13px;">${t.v.toFixed(1)}</p></div>
+        <div style="background:var(--color-background-secondary);padding:8px;border-radius:6px;"><p style="font-size:10px;color:var(--color-text-tertiary);">Approach</p><p style="font-weight:700;font-size:13px;">${t.a.toFixed(1)}</p></div>
+        <div style="background:var(--color-background-secondary);padding:8px;border-radius:6px;"><p style="font-size:10px;color:var(--color-text-tertiary);">Promo</p><p style="font-weight:700;font-size:13px;color:#059669;">${t.pp.toFixed(0)}%</p></div>
+      </div>
+    </div>`;
+  });
+}
+
+document.addEventListener('DOMContentLoaded', renderTeachers);
+
+window.sw = function(id, el) {
+  document.querySelectorAll('.pnl').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
+  const target = document.getElementById(id);
+  if(target) target.classList.add('on');
+  if(el) el.classList.add('on');
+}
+</script>

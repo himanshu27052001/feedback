@@ -1,0 +1,1 @@
+PRAGMA table_xinfo('student_feedback');

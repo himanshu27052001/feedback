@@ -1,0 +1,1153 @@
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  :root {
+    --color-background-primary: #1b1c19;
+    --color-background-secondary: #242522;
+    --color-background-card: #242522;
+    --color-border-primary: #565752;
+    --color-border-secondary: #343531;
+    --color-text-primary: #f1f0eb;
+    --color-text-secondary: #c5c3bc;
+    --color-text-tertiary: #96948d;
+    --color-accent: #3b7d0f;
+    --color-accent-2: #c77a0c;
+    --color-accent-3: #1f6fb2;
+    --border-radius-sm: 6px;
+    --border-radius-md: 10px;
+    --border-radius-lg: 9px;
+    --shadow-sm: none;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { 
+    background: var(--color-background-primary);
+    color: var(--color-text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  .dashboard { 
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 38px 36px 60px;
+    min-height: 100vh;
+  }
+
+  .nav-links { display: flex; gap: 8px; margin-bottom: 2rem; }
+  .nav-btn {
+    padding: 10px 20px;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--color-text-primary);
+    text-decoration: none; 
+    font-size: 15px;
+    font-weight: 800;
+    border: 1px solid var(--color-border-primary); 
+    transition: all 0.2s; 
+  }
+  .nav-btn:hover { background: #232420; border-color: #7a7b74; color: var(--color-text-primary); }
+  .nav-btn.active { background: #232420; color: white; border-color: #76776f; box-shadow: none; }
+
+  .nav { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 20px; border-bottom: 1px solid #3e3f3a; padding: 0 0 19px; border-radius: 0; background: transparent; box-shadow: none; }
+  .nb { 
+    padding: 10px 20px;
+    border-radius: 9px;
+    border: 1px solid var(--color-border-primary);
+    font-size: 17px;
+    font-weight: 800;
+    cursor: pointer; 
+    background: transparent; 
+    color: var(--color-text-primary);
+    transition: all 0.2s ease;
+    text-transform: lowercase;
+    letter-spacing: 0;
+  }
+  .nb:hover { color: var(--color-text-primary); border-color: #7a7b74; background: #232420; }
+  .nb.on { background: #232420; color: var(--color-text-primary); border-color: #76776f; }
+
+  .pnl { display: none; }
+  .pnl.on { display: block; animation: fadeIn 0.3s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .grid-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 22px; }
+  .stat-card { background: var(--color-background-card); border-radius: var(--border-radius-lg); padding: 17px 18px 15px; border: 1px solid transparent; box-shadow: none; }
+  .stat-label { font-size: 13px; color: var(--color-text-secondary); text-transform: lowercase; font-weight: 800; margin-bottom: 5px; }
+  .stat-val { font-size: 26px; font-weight: 900; color: var(--color-text-primary); line-height: 1.05; }
+  .stat-sub { font-size: 13px; color: var(--color-text-tertiary); margin-top: 4px; font-weight: 700; }
+
+  .card { background: transparent; border-radius: 0; padding: 0; border: 0; box-shadow: none; margin-bottom: 28px; }
+  .card-title { font-size: 14px; font-weight: 900; margin-bottom: 14px; color: var(--color-text-tertiary); display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: .08em; }
+  .card-title::before { display: none; }
+
+  /* Color-coded callouts for the summary */
+  .callout-danger { border-left: 4px solid #b72f32; background: rgba(183, 47, 50, 0.1); }
+  .callout-warning { border-left: 4px solid #c77a0c; background: rgba(199, 122, 12, 0.1); }
+  .callout-success { border-left: 4px solid #3b7d0f; background: rgba(59, 125, 15, 0.1); }
+  .callout-info { border-left: 4px solid #1f6fb2; background: rgba(31, 111, 178, 0.1); }
+
+  .insight-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .insight-title {
+    display: block;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+
+  @media (max-width: 900px) { .insight-grid { grid-template-columns: 1fr; } }
+
+  .tbl-container { overflow-x: auto; }
+  .tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .tbl th { text-align: left; padding: 12px 16px; border-bottom: 1px solid #3e3f3a; color: var(--color-text-tertiary); font-weight: 800; text-transform: lowercase; font-size: 12px; }
+  .tbl td { padding: 12px 16px; border-bottom: 1px solid #30312d; color: var(--color-text-secondary); }
+  .tbl tr:hover { background-color: #242522; }
+
+  .faculty-analytics {
+    display: grid;
+    gap: 24px;
+    margin-top: 34px;
+  }
+  .faculty-chart-grid {
+    display: grid;
+    gap: 22px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .faculty-chart-card {
+    border-top: 1px solid #3e3f3a;
+    padding-top: 22px;
+  }
+  .faculty-chart-title {
+    color: var(--color-text-tertiary);
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: .08em;
+    margin: 0 0 16px;
+    text-transform: uppercase;
+  }
+  .subject-tables {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .subject-panel {
+    background: transparent;
+    border-top: 1px solid #3e3f3a;
+    padding-top: 16px;
+  }
+  .subject-panel-head {
+    align-items: baseline;
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+  .subject-panel-title {
+    color: var(--color-text-primary);
+    font-size: 15px;
+    font-weight: 900;
+  }
+  .subject-panel-meta {
+    color: var(--color-text-tertiary);
+    font-size: 12px;
+    font-weight: 800;
+  }
+  .subject-mini-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .subject-mini-table th {
+    border-bottom: 1px solid #3e3f3a;
+    color: var(--color-text-tertiary);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .03em;
+    padding: 9px 8px;
+    text-align: left;
+    text-transform: lowercase;
+  }
+  .subject-mini-table td {
+    border-bottom: 1px solid #30312d;
+    color: var(--color-text-secondary);
+    font-weight: 750;
+    padding: 10px 8px;
+  }
+  .subject-mini-table tr:last-child td { border-bottom: 0; }
+
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; text-transform: capitalize; }
+  .badge-success { background: #dcfce7; color: #166534; }
+  .badge-warning { background: #fef3c7; color: #92400e; }
+  .badge-danger { background: #fee2e2; color: #991b1b; }
+  .badge-info { background: #e0f2fe; color: #075985; }
+  .rankings-insights {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .insight-pill {
+    background: #242522;
+    border: 1px solid #343531;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+  .pill-urgent { border-left: 4px solid #b72f32; }
+  .pill-benchmark { border-left: 4px solid #3b7d0f; }
+
+  .hmap-scroll {
+    overflow-x: auto;
+    margin-top: 1rem;
+    padding: 8px;
+    border: 1px solid #343531;
+    border-radius: var(--border-radius-lg);
+    background: #242522;
+  }
+  #hmap-tbl {
+    border-collapse: separate;
+    border-spacing: 6px 9px;
+    min-width: 0;
+    width: 100%;
+    table-layout: fixed;
+  }
+  #hmap-tbl th {
+    color: var(--color-text-tertiary);
+    font-size: 12px;
+    font-weight: 800;
+    padding: 6px 4px 10px;
+    text-align: center;
+    white-space: nowrap;
+  }
+  #hmap-tbl th:first-child {
+    left: 0;
+    position: sticky;
+    text-align: left;
+    z-index: 3;
+    width: 176px;
+  }
+  .hcell {
+    align-items: center;
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 6px;
+    box-shadow: none;
+    color: white;
+    display: flex;
+    font-size: 14px;
+    font-weight: 850;
+    justify-content: center;
+    min-height: 48px;
+    min-width: 72px;
+    padding: 0 10px;
+    text-align: center;
+    transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
+  }
+  .hcell:hover {
+    filter: brightness(1.08);
+    transform: translateY(-2px);
+    box-shadow: none;
+  }
+  .rl {
+    background: #242522;
+    border: 1px solid #343531;
+    border-radius: 6px;
+    color: var(--color-text-primary);
+    font-size: 14px;
+    font-weight: 800;
+    left: 0;
+    min-width: 172px;
+    padding: 14px 16px !important;
+    position: sticky;
+    white-space: nowrap;
+    z-index: 2;
+  }
+  .heatmap-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 0 12px;
+  }
+  .heatmap-chip {
+    background: #242522;
+    border: 1px solid #343531;
+    border-radius: 999px;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 7px 11px;
+  }
+  .heatmap-controls {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 0 16px;
+  }
+  .heatmap-control-label {
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .heatmap-option {
+    align-items: center;
+    background: transparent;
+    border: 1px solid var(--color-border-primary);
+    border-radius: 999px;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 13px;
+    font-weight: 800;
+    gap: 7px;
+    padding: 8px 12px;
+    transition: background .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
+  }
+  .heatmap-option:hover {
+    border-color: #7a7b74;
+    color: var(--color-text-primary);
+    transform: translateY(-1px);
+  }
+  .heatmap-option input {
+    accent-color: var(--color-accent);
+    height: 14px;
+    width: 14px;
+  }
+  .heatmap-option:has(input:checked) {
+    background: #242522;
+    border-color: #7a7b74;
+    color: var(--color-text-primary);
+  }
+  .heatmap-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 1.25rem;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .legend-item {
+    align-items: center;
+    background: #242522;
+    border: 1px solid #343531;
+    border-radius: 999px;
+    display: flex;
+    gap: 7px;
+    padding: 7px 10px;
+  }
+  .heatmap-legend > div {
+    align-items: center;
+    background: #242522;
+    border: 1px solid #343531;
+    border-radius: 999px;
+    display: flex;
+    gap: 7px;
+    padding: 7px 10px;
+  }
+  .legend-dot { width: 12px; height: 12px; border-radius: 4px; }
+
+  canvas { max-width: 100% !important; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .grid-2 > :last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .chart-card { background:var(--color-background-card); border-radius:var(--border-radius-lg); padding:1.2rem; border:1px solid transparent; box-shadow: none; }
+  .chart-empty { min-height: 240px; display: grid; place-items: center; color: var(--color-text-tertiary); font-size: 13px; border: 1px dashed var(--color-border-primary); border-radius: var(--border-radius-md); }
+  @media (max-width: 900px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .subject-tables { grid-template-columns: 1fr; }
+  }
+
+  .header { display: none; }
+  .title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .title { 
+    font-size: 32px; 
+    font-weight: 850; 
+    letter-spacing: -0.03em; 
+    margin: 0; 
+    background: none;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: currentColor;
+  }
+  .status-badge {
+    background: #242522;
+    color: var(--color-text-secondary);
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid #565752;
+  }
+  .status-dot { width: 6px; height: 6px; background: var(--color-accent-2); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+  .subtitle { 
+    font-size: 15px; 
+    color: var(--color-text-secondary); 
+    max-width: 800px; 
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .callout {
+    background: #242522;
+    border: 1px solid #343531;
+    color: var(--color-text-secondary);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem 1.2rem;
+  }
+  /* #p0 > .callout { display: none; } */
+  .card [style*="background:#059669"] { background:#3b7d0f !important; }
+  .card [style*="background:#2563eb"] { background:#1f6fb2 !important; }
+  .card [style*="background:#64748b"] { background:#c77a0c !important; }
+  .card [style*="background:#d97706"] { background:#a33e1f !important; }
+  .card [style*="background:#dc2626"] { background:#b72f32 !important; }
+  .card div[style*="height:24px;background"][style*="display:flex"] {
+    min-width: 140px;
+    overflow: visible;
+    white-space: nowrap;
+  }
+  .score-bars { display:grid; gap: 8px; }
+  .score-row { align-items:center; display:grid; gap:10px; grid-template-columns: 48px minmax(0, 1fr) 96px; }
+  .score-label { color: var(--color-text-secondary); font-size: 14px; font-weight: 900; }
+  .score-track { background:#292a26; border-radius:4px; height:22px; overflow:hidden; }
+  .score-fill { height:100%; border-radius:4px; min-width: 4px; }
+  .score-count { color: var(--color-text-primary); font-size:13px; font-weight:900; line-height:1.15; text-align:right; white-space: nowrap; }
+  @media (max-width: 900px) {
+    .dashboard { padding: 24px; }
+    .grid-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+
+<div class="dashboard">
+
+<header class="header" style="display:flex; justify-content: space-between; align-items: flex-start;">
+  <div>
+    <div class="title-row">
+      <h1 class="title">Full KPI Dashboard</h1>
+      <div class="status-badge">
+        <span class="status-dot"></span>
+        Deep Analytics
+      </div>
+    </div>
+    <p class="subtitle">Comprehensive performance metrics for 11 teachers across 9,589 ratings. Every dimension, every batch, quantified.</p>
+  </div>
+  <div class="nav-links" style="display:flex; gap:8px; margin-top: 4px;">
+    <!-- <a href="/report" class="nav-btn">Insight Report</a> -->
+    <a href="/full" class="nav-btn active">Dashboard</a>
+  </div>
+</header>
+
+<div class="nav">
+  <button class="nb on" onclick="sw('p0',this)">executive summary</button>
+  <button class="nb" onclick="sw('p1',this)">teacher rankings</button>
+  <button class="nb" onclick="sw('p2',this)">heatmap</button>
+  <button class="nb" onclick="sw('p3',this)">subject rankings</button>
+  <button class="nb" onclick="sw('p6',this)">mentor audit</button>
+  <button class="nb" onclick="sw('p7',this)">timing</button>
+</div>
+
+<div id="p0" class="pnl on">
+  <div class="callout" style="margin-bottom:1.5rem;">
+    <strong>Strategic Note:</strong> Effective teaching requires a balance of <em>Approachability</em> and <em>Class Control</em>. High control without approachability creates a restrictive environment, while high approachability without control leads to a lack of academic rigor.
+  </div>
+  <div class="grid-stats">
+    <div class="stat-card"><div class="stat-label">total responses</div><div class="stat-val">{{ summary.total }}</div><div class="stat-sub">{{ summary.g10_b + summary.g9_b }} active batches</div></div>
+    <div class="stat-card"><div class="stat-label">institute avg</div><div class="stat-val">{{ '%.2f'|format(coreMetrics.institute_avg) }}<span style="font-size:14px;color:var(--color-text-tertiary);">/5</span></div><div class="stat-sub">All teacher dimensions</div></div>
+    <div class="stat-card"><div class="stat-label">promoter avg (4-5)</div><div class="stat-val" style="color:#3b7d0f;">{{ '%.1f'|format(coreMetrics.promoter_rate) }}%</div><div class="stat-sub">across all teachers</div></div>
+    <div class="stat-card"><div class="stat-label">detractor avg (1-2)</div><div class="stat-val" style="color:#c23434;">{{ '%.1f'|format(coreMetrics.detractor_rate) }}%</div><div class="stat-sub">across all teachers</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Score Distribution (9,589 Ratings)</div>
+    <div style="display:grid; gap: 12px;">
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;min-width:40px;">5 ★</span><div style="flex:1;background:var(--color-background-secondary);border-radius:6px;height:24px;overflow:hidden;"><div style="width:47.1%;height:24px;background:#059669;display:flex;align-items:center;padding-left:12px;font-size:11px;font-weight:700;color:white;">4,513 ratings (47.1%)</div></div></div>
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;min-width:40px;">4 ★</span><div style="flex:1;background:var(--color-background-secondary);border-radius:6px;height:24px;overflow:hidden;"><div style="width:23.8%;height:24px;background:#2563eb;display:flex;align-items:center;padding-left:12px;font-size:11px;font-weight:700;color:white;">2,285 ratings (23.8%)</div></div></div>
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;min-width:40px;">3 ★</span><div style="flex:1;background:var(--color-background-secondary);border-radius:6px;height:24px;overflow:hidden;"><div style="width:17.4%;height:24px;background:#64748b;display:flex;align-items:center;padding-left:12px;font-size:11px;font-weight:700;color:white;">1,664 ratings (17.4%)</div></div></div>
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;min-width:40px;">2 ★</span><div style="flex:1;background:var(--color-background-secondary);border-radius:6px;height:24px;overflow:hidden;"><div style="width:6.5%;height:24px;background:#d97706;display:flex;align-items:center;padding-left:12px;font-size:11px;font-weight:700;color:white;">620 ratings (6.5%)</div></div></div>
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;min-width:40px;">1 ★</span><div style="flex:1;background:var(--color-background-secondary);border-radius:6px;height:24px;overflow:hidden;"><div style="width:5.3%;height:24px;background:#dc2626;display:flex;align-items:center;padding-left:12px;font-size:11px;font-weight:700;color:white;">507 ratings (5.3%)</div></div></div>
+    </div>
+  </div>
+
+  <div class="grid-stats">
+    <div class="stat-card"><div class="stat-label">teachers above 4</div><div class="stat-val">{{ coreMetrics.teachers_above_4 }}</div><div class="stat-sub">Out of {{ coreMetrics.teacher_count }} faculty</div></div>
+    <div class="stat-card"><div class="stat-label">weakest parameter</div><div class="stat-val" style="font-size:22px;">{{ coreMetrics.weakest_parameter }}</div><div class="stat-sub">{{ '%.2f'|format(coreMetrics.weakest_parameter_score) }}/5 average</div></div>
+    <div class="stat-card"><div class="stat-label">10th avg</div><div class="stat-val">{{ '%.2f'|format(coreMetrics.g10_avg) }}<span style="font-size:14px;color:var(--color-text-tertiary);">/5</span></div><div class="stat-sub">{{ summary.g10_b }} batches · {{ summary.g10 }} responses</div></div>
+    <div class="stat-card"><div class="stat-label">9th avg</div><div class="stat-val">{{ '%.2f'|format(coreMetrics.g9_avg) }}<span style="font-size:14px;color:var(--color-text-tertiary);">/5</span></div><div class="stat-sub">{{ summary.g9_b }} batches · {{ summary.g9 }} responses</div></div>
+  </div>
+  <!-- Top Priority: The Masking Effect -->
+  <div class="callout callout-danger" style="margin-bottom: 1.5rem; display: block !important;">
+    <span class="insight-title" style="color: #b72f32;">Critical: Faculty Performance Gap</span>
+    <strong>Only 5 of 11 teachers score above 4.0.</strong> The institute average of 4.00 is being held up by a small group of high performers masking significant underperformance across the remaining 6 faculty members.
+  </div>
+
+  <div class="insight-grid">
+    <!-- Critical: Systemic Engagement Gap -->
+    <div class="callout callout-warning">
+      <span class="insight-title" style="color: #c77a0c;">Systemic Issue: Engagement</span>
+      <strong>Engagement is the weakest parameter at 3.95/5.</strong> Across all 11 teachers, engagement scores lower than vibe and approachability without exception. This is a training gap, not an individual failure.
+    </div>
+
+    <!-- High Value: Detractor Concentration -->
+    <div class="callout callout-warning">
+      <span class="insight-title" style="color: #c77a0c;">Retention Risk: Detractors</span>
+      <strong>11.1% detractor rate (1 in 9 ratings).</strong> This represents ~1,065 dissatisfied responses. These are heavily concentrated in 2–3 teachers but drag the entire institute's reputation down.
+    </div>
+  </div>
+</div>
+
+<div id="p1" class="pnl">
+  <div class="rankings-insights">
+    <div class="insight-pill pill-urgent">
+      <strong>URGENT:</strong> Chetna Ma'am's 3.03 engagement is a critical outlier. Immediate delivery intervention required.
+    </div>
+    <div class="insight-pill pill-benchmark">
+      <strong>BENCHMARK:</strong> Aniket Sir (4.45) provides the model for high-engagement/high-vibe teaching at scale.
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Detailed Teacher Performance KPI</div>
+    <div class="tbl-container">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Teacher</th>
+            <th>Subject</th>
+            <th style="text-align:right;">Responses</th>
+            <th style="text-align:right;">Overall</th>
+            <th style="text-align:right;">Vibe</th>
+            <th style="text-align:right;">Approach</th>
+            <th style="text-align:right;">Engage</th>
+            <th style="text-align:right;">Promoters</th>
+            <th style="text-align:right;">Detractors</th>
+            <th style="text-align:center;">Status</th>
+          </tr>
+        </thead>
+        <tbody id="teacher-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div id="p3" class="pnl">
+  <div class="faculty-analytics">
+    
+    <!-- Row 1: Subject Averages + Isolation/Departmental Warnings -->
+    <div style="display: grid; grid-template-columns: 1fr 350px; gap: 24px; align-items: start;">
+      <div class="faculty-chart-card">
+        <p class="faculty-chart-title">Subject-level averages</p>
+        <div style="height: 360px;"><canvas id="subject-average-chart"></canvas></div>
+      </div>
+      
+      <div style="display: flex; flex-direction: column; gap: 12px; padding-top: 40px;">
+        <div class="callout callout-danger" style="font-size: 13px;">
+          <span class="insight-title" style="color: #b72f32;">Critical: Subject Isolation</span>
+          <strong>Geo/Eco (3.27)</strong> is pulling the institute average down. As a single-teacher subject, there is no internal peer-learning buffer; individual performance is the subject average.
+        </div>
+        <div class="callout callout-warning" style="font-size: 13px;">
+          <span class="insight-title" style="color: #c77a0c;">Departmental Decay</span>
+          <strong>English (3.75)</strong> is the only multi-teacher subject below the 4.0 benchmark. This points to a curriculum or departmental issue rather than just one teacher.
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Rankings + Maths Variance Warning -->
+    <div class="faculty-chart-card">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px;">
+        <p class="faculty-chart-title" style="margin: 0;">Subject-wise faculty rankings</p>
+        <div class="insight-pill pill-urgent" style="max-width: 500px; font-size: 12px;">
+          <strong>Maths Variance:</strong> 0.80-point spread between Aniket Sir (4.45) and Kapil/Dhulesh (3.65). This is a "Maths Lottery" where student experience depends entirely on teacher assignment.
+        </div>
+      </div>
+      <div class="subject-tables" id="subject-ranking-tables"></div>
+    </div>
+
+    <!-- Row 3: Grade Comparison + Shreyash Sir Diagnostic -->
+    <div style="display: grid; grid-template-columns: 1fr 350px; gap: 24px; align-items: start;">
+      <div class="faculty-chart-card">
+        <p class="faculty-chart-title">9th grade vs 10th grade by subject</p>
+        <div style="height: 360px;"><canvas id="subject-grade-chart"></canvas></div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; padding-top: 40px;">
+        <div class="callout callout-info" style="font-size: 13px;">
+          <span class="insight-title" style="color: #1f6fb2;">Diagnostic: 9th/10th Gap</span>
+          <strong>Hist/Pol Sci</strong> shows the largest gap (3.4 vs 4.3). Shreyash Sir excels with 10th grade but performance collapses in 9th. Suggests a connection or curriculum mismatch with younger students.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="p2" class="pnl">
+  <div class="card">
+    <div class="insight-grid" style="margin-bottom: 20px;">
+    <div class="callout callout-danger">
+      <strong>BATCH ALERT (9B3A):</strong> Systemic performance collapse across 4 subjects. Indicates a batch-level culture issue, not individual teacher failure.
+    </div>
+    <div class="callout callout-warning">
+      <strong>CONSISTENCY CHECK:</strong> Shreyash Sir shows extreme variance (4.7 vs 3.1). Performance is highly dependent on batch dynamics; requires adaptability coaching.
+    </div>
+    </div>
+    <div class="card-title">Teacher x Batch Heatmap (Overall Avg)</div>
+    <div class="heatmap-meta">
+      <span class="heatmap-chip">Rows: faculty</span>
+      <span class="heatmap-chip">Columns: batches</span>
+      <span class="heatmap-chip">Score: vibe + approach + engagement</span>
+    </div>
+    <div class="heatmap-controls" id="heatmap-controls">
+      <span class="heatmap-control-label">Categories</span>
+      <label class="heatmap-option"><input type="checkbox" value="overall" checked> Overall</label>
+      <label class="heatmap-option"><input type="checkbox" value="v"> Vibe</label>
+      <label class="heatmap-option"><input type="checkbox" value="a"> Approach</label>
+      <label class="heatmap-option"><input type="checkbox" value="e"> Engagement</label>
+    </div>
+    <div class="hmap-scroll">
+      <table id="hmap-tbl"></table>
+    </div>
+    <div class="heatmap-legend">
+      <div style="display:flex; align-items:center; gap:6px;"><span style="width:12px; height:12px; border-radius:3px; background:#3b7d0f;"></span> 4.3+ Excellent</div>
+      <div style="display:flex; align-items:center; gap:6px;"><span style="width:12px; height:12px; border-radius:3px; background:#1f6fb2;"></span> 3.8 - 4.29 Good</div>
+      <div style="display:flex; align-items:center; gap:6px;"><span style="width:12px; height:12px; border-radius:3px; background:#c77a0c;"></span> 3.3 - 3.79 Needs Work</div>
+      <div style="display:flex; align-items:center; gap:6px;"><span style="width:12px; height:12px; border-radius:3px; background:#b72f32;"></span> Below 3.3 Critical</div>
+    </div>
+  </div>
+</div>
+
+<div id="p6" class="pnl">
+  <p class="sec">Mentor Performance Audit</p>
+  <!-- High Level Positive -->
+  <div class="insight-grid" style="margin-bottom: 24px;">
+    <div class="callout callout-success">
+      <span class="insight-title" style="color: #3b7d0f;">Benchmark: Dual-Threat Leadership</span>
+      <strong>Raj Sir</strong> leads both KPIs. He maintains a high-control classroom (minimal Red/Orange) while remaining the most approachable mentor. This is the institutional target.
+    </div>
+
+    <!-- The "Nice Guy" Diagnostic -->
+    <div class="callout callout-warning">
+      <span class="insight-title" style="color: #c77a0c;">Diagnostic: Authority vs. Approachability</span>
+      <strong>Kuldip Sir</strong> shows a "Nice Guy" profile: High approachability but compressed class control. Effective mentoring requires authority; approachability alone is insufficient for a productive environment.
+    </div>
+  </div>
+
+  <div class="callout callout-danger" style="margin-bottom: 24px;">
+    <span class="insight-title" style="color: #b72f32;">Urgent: "Zoo Energy" Alert</span>
+    <strong>Priyanshu Sir and Sangini Ma'am</strong> have the highest detractor rates in Class Control. Red/Orange segments indicate a subset of students find these environments chaotic and unproductive. 
+  </div>
+
+  <div class="grid-2">
+    <div class="chart-card">
+      <p style="font-size:12px; color:var(--color-text-tertiary); text-transform:uppercase; font-weight:700; margin-bottom:1rem;">Mentor Approachability (TQ)</p>
+      <div style="height:400px;"><canvas id="mentor-bar-chart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <p style="font-size:12px; color:var(--color-text-tertiary); text-transform:uppercase; font-weight:700; margin-bottom:1rem;">Class Control Distribution (Truth Teller)</p>
+      <div style="height:400px;"><canvas id="mentor-dist-chart"></canvas></div>
+    </div>
+  </div>
+  <div class="callout warn" style="margin-top:1.5rem;">
+    <strong>Managerial Insight:</strong> Mentors in the bottom-left quadrant of the trade-off plot require immediate pedagogical intervention. Horizontal reference line at 4.0 indicates the minimum institutional standard.
+  </div>
+</div>
+
+<div id="p7" class="pnl">
+  <div class="insight-grid" style="margin-bottom: 20px;">
+    <!-- The Data Quality Warning -->
+    <div class="callout callout-warning">
+      <span class="insight-title" style="color: #c77a0c;">Data Audit Required</span>
+      <strong>Before 11am spike (~175 students)</strong> represents 33% of the data. We need to verify if these are actual morning batches or "first-box" click-through errors before using this for scheduling decisions.
+    </div>
+
+    <!-- The Actionable Fatigue Insight -->
+    <div class="callout callout-danger">
+      <span class="insight-title" style="color: #b72f32;">Retention Risk: Fatigue</span>
+      <strong>10% of students reach home after 3pm.</strong> There is likely a direct correlation between this late-arrival cohort and the "Detractor" ratings in the Teacher KPI section. Summer heat + late arrivals = engagement collapse.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Home Arrival Timing (Summer)</div>
+    <div style="height: 380px;"><canvas id="timing-chart"></canvas></div>
+  </div>
+
+  <div class="callout callout-info" style="margin-top: 1.5rem;">
+    <strong>Structural Note:</strong> The 2pm–3pm dip suggests a non-linear exit flow. This points to batch scheduling gaps where students are either rushed out or held significantly longer than the average exit window.
+  </div>
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const batches = {{ batches | tojson | safe }};
+const batchN = {{ batchN | tojson | safe }};
+const teachers = {{ teachers | tojson | safe }};
+const data = {{ data | tojson | safe }};
+const infraData = {{ infraData | tojson | safe }};
+const TS = {{ TS | tojson | safe }};
+const BATCHES = batches;
+const BN = batchN;
+const BS = {{ batchScores | tojson | safe }};
+const INFRA = infraData;
+const timingData = {{ timing | tojson | safe }};
+const mentorData = {{ mentorData | tojson | safe }};
+const summaryData = {{ summary | tojson | safe }};
+const chartInstances = [];
+const metricLabels = { v: 'Vibe', a: 'Approach', e: 'Engagement' };
+
+function bc(v){if(v>=4.3)return'#6fa72e';if(v>=4.0)return'#9fbd2e';if(v>=3.8)return'#d98a21';return'#d94b3d';}
+function subjectAvgColor(v){if(v>4.3)return'#6fa72e';if(v>=4.0)return'#9fbd2e';if(v>=3.8)return'#d98a21';if(v>=3.5)return'#d94b3d';return'#b72f32';}
+function badgeCls(v){if(v>=4.3)return'badge-success';if(v>=4.0)return'badge-info';if(v>=3.5)return'badge-warning';return'badge-danger';}
+function badgeTxt(v){if(v>=4.3)return'star';if(v>=4.0)return'great';if(v>=3.8)return'good';if(v>=3.5)return'average';return'needs improvement';}
+function ov(d){
+  if(!d) return null;
+  const vals = [d.v, d.a, d.e].filter(val => val !== null && val !== undefined).map(Number).filter(Number.isFinite);
+  return vals.length ? vals.reduce((sum, val) => sum + val, 0) / vals.length : null;
+}
+function heatmapMetrics(){
+  const checks = [...document.querySelectorAll('#heatmap-controls input:checked')].map(input => input.value);
+  return checks.includes('overall') || checks.length === 0 ? ['v','a','e'] : checks;
+}
+function heatmapValue(d, metrics){
+  if(!d) return null;
+  const vals = metrics.map(key => d[key]).filter(val => val !== null && val !== undefined).map(Number).filter(Number.isFinite);
+  return vals.length ? vals.reduce((sum, val) => sum + val, 0) / vals.length : null;
+}
+function setupHeatmapControls(){
+  const controls = document.getElementById('heatmap-controls');
+  if(!controls || controls.dataset.ready) return;
+  controls.dataset.ready = 'true';
+  controls.addEventListener('change', event => {
+    const changed = event.target;
+    if(!changed || changed.tagName !== 'INPUT') return;
+    const inputs = [...controls.querySelectorAll('input')];
+    const overall = inputs.find(input => input.value === 'overall');
+    const dimensions = inputs.filter(input => input.value !== 'overall');
+    if(changed.value === 'overall' && changed.checked) dimensions.forEach(input => input.checked = false);
+    if(changed.value !== 'overall' && changed.checked && overall) overall.checked = false;
+    if(!inputs.some(input => input.checked) && overall) overall.checked = true;
+    renderHeatmap();
+  });
+}
+function hmClr(v,n){
+  if(!v)return'#eef0e8';
+  const o=n<5?0.66:1;
+  if(v>=4.3)return`rgba(59,125,15,${o})`;
+  if(v>=3.8)return`rgba(31,111,178,${o})`;
+  if(v>=3.3)return`rgba(199,122,12,${o})`;
+  return`rgba(183,47,50,${o})`;
+}
+function renderHeatmap(){
+  const hmT=document.getElementById('hmap-tbl');
+  if(!hmT) return;
+  const metrics = heatmapMetrics();
+  const metricName = metrics.length === 3 ? 'Overall' : metrics.map(key => metricLabels[key]).join(' + ');
+  const shB=BATCHES.map(b=>b.replace('th ','').replace(' ',''));
+  let hh=`<tr><th style="text-align:left;">Teacher</th>${shB.map(b=>`<th>${b}</th>`).join('')}</tr>`;
+  TS.forEach(t=>{
+    hh+=`<tr><td class="rl">${t.n}</td>`;
+    BATCHES.forEach(b=>{
+      const d=t.bb[b];
+      const v=heatmapValue(d, metrics);
+      const n=d?d.n:0;
+      const label = v ? v.toFixed(1) : '-';
+      const title = v ? `${t.n} / ${b}: ${v.toFixed(2)} ${metricName} avg from ${n} responses` : `${t.n} / ${b}: no ratings`;
+      hh+=`<td><span class="hcell" title="${title}" style="background:${hmClr(v,n)};">${label}</span></td>`;
+    });
+    hh+='</tr>';
+  });
+  hmT.innerHTML=hh;
+}
+function gradeKey(batch){
+  const normalized = String(batch || '').toLowerCase();
+  if(normalized.includes('10')) return '10th';
+  if(normalized.includes('9')) return '9th';
+  return null;
+}
+function avgMetric(values){
+  const clean = values.map(Number).filter(Number.isFinite);
+  return clean.length ? clean.reduce((sum, val) => sum + val, 0) / clean.length : null;
+}
+function subjectRankings(){
+  const grouped = {};
+  TS.forEach(t => {
+    const subject = t.s || 'Unknown';
+    if(!grouped[subject]) grouped[subject] = {
+      subject,
+      teachers: [],
+      totalResponses: 0,
+      weightedOverall: 0,
+      weight: 0,
+      grades: {
+        '9th': { weightedOverall: 0, weight: 0 },
+        '10th': { weightedOverall: 0, weight: 0 }
+      }
+    };
+
+    const responseCount = Number(t.rc || 0);
+    grouped[subject].teachers.push(t);
+    grouped[subject].totalResponses += responseCount;
+    if(Number.isFinite(Number(t.ov))) {
+      const weight = Math.max(responseCount, 1);
+      grouped[subject].weightedOverall += Number(t.ov) * weight;
+      grouped[subject].weight += weight;
+    }
+
+    BATCHES.forEach(batch => {
+      const key = gradeKey(batch);
+      const batchData = t.bb ? t.bb[batch] : null;
+      const score = ov(batchData);
+      const count = batchData ? Number(batchData.n || 0) : 0;
+      if(!key || score === null || count <= 0) return;
+      grouped[subject].grades[key].weightedOverall += score * count;
+      grouped[subject].grades[key].weight += count;
+    });
+  });
+
+  return Object.values(grouped).map(subject => {
+    const teacherAvgs = subject.teachers.map(t => Number(t.ov)).filter(Number.isFinite);
+    const avg = subject.weight ? subject.weightedOverall / subject.weight : avgMetric(teacherAvgs);
+    const grade9 = subject.grades['9th'].weight ? subject.grades['9th'].weightedOverall / subject.grades['9th'].weight : null;
+    const grade10 = subject.grades['10th'].weight ? subject.grades['10th'].weightedOverall / subject.grades['10th'].weight : null;
+    return {
+      ...subject,
+      avg,
+      grade9,
+      grade10,
+      teachers: [...subject.teachers].sort((a,b) => b.ov - a.ov)
+    };
+  }).sort((a,b) => b.avg - a.avg);
+}
+function renderSubjectTables(rankings){
+  const target = document.getElementById('subject-ranking-tables');
+  if(!target) return;
+  target.innerHTML = rankings.map(subject => `
+    <div class="subject-panel">
+      <div class="subject-panel-head">
+        <span class="subject-panel-title">${subject.subject}</span>
+        <span class="subject-panel-meta">${subject.avg.toFixed(2)} avg / ${subject.totalResponses} responses</span>
+      </div>
+      <table class="subject-mini-table">
+        <thead>
+          <tr>
+            <th>teacher</th>
+            <th style="text-align:right;">overall</th>
+            <th style="text-align:right;">vibe</th>
+            <th style="text-align:right;">approach</th>
+            <th style="text-align:right;">engage</th>
+            <th style="text-align:right;">resp.</th>
+            <th style="text-align:right;">vs subj</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${subject.teachers.map(t => {
+            const delta = Number(t.ov) - subject.avg;
+            return `<tr>
+              <td style="color:var(--color-text-primary);font-weight:900;">${t.n}</td>
+              <td style="text-align:right;color:${bc(t.ov)};">${t.ov.toFixed(2)}</td>
+              <td style="text-align:right;">${t.v.toFixed(2)}</td>
+              <td style="text-align:right;">${t.a.toFixed(2)}</td>
+              <td style="text-align:right;">${t.e.toFixed(2)}</td>
+              <td style="text-align:right;">${t.rc || 0}</td>
+              <td style="text-align:right;color:${delta >= 0 ? '#3b7d0f' : '#b72f32'};">${delta >= 0 ? '+' : ''}${delta.toFixed(2)}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `).join('');
+}
+function addChart(canvasId, config){
+  const el = document.getElementById(canvasId);
+  if(!el || typeof Chart === 'undefined') return null;
+  const chart = new Chart(el, config);
+  chartInstances.push(chart);
+  return chart;
+}
+function showChartMessage(canvasId, msg){
+  const el = document.getElementById(canvasId);
+  if(!el || !el.parentElement) return;
+  el.parentElement.innerHTML = `<div class="chart-empty">${msg}</div>`;
+}
+function resizeCharts(){
+  requestAnimationFrame(() => chartInstances.forEach(chart => chart.resize()));
+}
+
+function renderDashboard(){
+  const tbody=document.getElementById('teacher-tbody');
+  tbody.innerHTML='';
+  [...TS].sort((a,b)=>b.ov-a.ov).forEach(t=>{
+    tbody.innerHTML+=`<tr>
+      <td style="font-weight:700; color:var(--color-text-primary);">${t.n}</td>
+      <td>${t.s}</td>
+      <td style="text-align:right;">${t.rc || 0}</td>
+      <td style="text-align:right; font-weight:700; color:${bc(t.ov)};">${t.ov.toFixed(2)}</td>
+      <td style="text-align:right;">${t.v.toFixed(2)}</td>
+      <td style="text-align:right;">${t.a.toFixed(2)}</td>
+      <td style="text-align:right;">${t.e.toFixed(2)}</td>
+      <td style="text-align:right; color:#059669;">${t.pp.toFixed(1)}%</td>
+      <td style="text-align:right; color:#dc2626;">${t.dd.toFixed(1)}%</td>
+      <td style="text-align:center;"><span class="badge ${badgeCls(t.ov)}">${badgeTxt(t.ov)}</span></td>
+    </tr>`;
+  });
+
+  setupHeatmapControls();
+  renderHeatmap();
+  const subjects = subjectRankings();
+  renderSubjectTables(subjects);
+
+  if(typeof Chart === 'undefined') {
+    ['subject-average-chart','subject-grade-chart','mentor-bar-chart','mentor-dist-chart','timing-chart'].forEach(id => showChartMessage(id, 'Charts could not load. Check the Chart.js script connection.'));
+    return;
+  }
+
+  addChart('subject-average-chart', {
+      type: 'bar',
+      data: {
+        labels: subjects.map(s => s.subject),
+        datasets: [{
+          label: 'Subject average',
+          data: subjects.map(s => s.avg),
+          // Updated color logic: >4.1 Green, >3.5 Blue, else Red
+          backgroundColor: subjects.map(s => {
+            const v = s.avg;
+            if (v > 4.1) return '#3b7d0f'; // Dashboard Green
+            if (v > 3.5) return '#1f6fb2'; // Dashboard Blue
+            return '#b72f32';             // Dashboard Red
+          }),
+          borderRadius: 6,
+          barThickness: 42
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { 
+            backgroundColor: '#242522',
+            titleColor: '#f1f0eb',
+            bodyColor: '#c5c3bc',
+            callbacks: { label: ctx => ` ${ctx.parsed.y.toFixed(2)} average` } 
+          }
+        },
+        scales: {
+          y: { 
+            min: 2.5, 
+            max: 5, 
+            grid: { color: '#343531' }, 
+            ticks: { color: '#96948d', font: { weight: 600 } } 
+          },
+          x: { 
+            grid: { display: false }, 
+            ticks: { color: '#f1f0eb', font: { weight: 800 } } 
+          }
+        }
+      }
+  });
+
+  addChart('subject-grade-chart', {
+    type: 'bar',
+    data: {
+      labels: subjects.map(s => s.subject),
+      datasets: [
+        {
+          label: '9th grade',
+          data: subjects.map(s => s.grade9),
+          backgroundColor: '#1f6fb2',
+          borderRadius: 5,
+          barThickness: 24
+        },
+        {
+          label: '10th grade',
+          data: subjects.map(s => s.grade10),
+          backgroundColor: '#3b7d0f',
+          borderRadius: 5,
+          barThickness: 24
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#9a9b93', boxWidth: 12, font: { weight: 800 } } },
+        tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y ? ctx.parsed.y.toFixed(2) : 'no data'}` } }
+      },
+      scales: {
+        y: { min: 2.5, max: 5, grid: { color: '#242522' }, ticks: { color: '#6f706a' } },
+        x: { grid: { color: '#20211e' }, ticks: { color: '#6f706a', font: { weight: 800 } } }
+      }
+    }
+  });
+
+  addChart('timing-chart', {
+    type: 'bar',
+    data: {
+      labels: ['Before 11am','11am-12pm','12pm-1pm','1pm-2pm','2pm-3pm','After 3pm'],
+      datasets: [{
+        label: 'Students',
+        data: timingData,
+        backgroundColor: ['#8cc63f', '#bfd648', '#f5b64a', '#e65b4a', '#b9bdb0', '#6f7568'],
+        borderRadius: 8,
+        barThickness: 44
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: '#e5e7df' }, ticks: { color: '#52564b' } },
+        x: { grid: { display: false }, ticks: { color: '#52564b' } }
+      }
+    }
+  });
+
+  // Mentor Charts
+  if(typeof mentorData !== 'undefined' && mentorData.length > 0) {
+    const sortedMentors = [...mentorData].sort((a,b) => b.approach - a.approach);
+    addChart('mentor-bar-chart', {
+      type: 'bar',
+      data: {
+        labels: sortedMentors.map(m => m.name),
+        datasets: [{
+          label: 'Approachability Score',
+          data: sortedMentors.map(m => m.approach),
+          backgroundColor: sortedMentors.map(m => m.approach >= 4 ? '#059669' : '#dc2626'),
+          borderRadius: 4
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { x: { min: 0, max: 5 } }
+      }
+    });
+
+    // 1. Prepare and Sort the data by weighted average (highest first)
+    const sortedMentorData = [...mentorData].map(m => {
+      const total = m.mgmt_dist.length;
+      const avg = total > 0 ? (m.mgmt_dist.reduce((a, b) => a + b, 0) / total) : 0;
+      
+      // Calculate percentages for each rating 1-5
+      const counts = [1, 2, 3, 4, 5].map(v => ({
+        val: v,
+        count: m.mgmt_dist.filter(x => Math.round(x) === v).length,
+        pct: total > 0 ? (m.mgmt_dist.filter(x => Math.round(x) === v).length / total * 100) : 0
+      }));
+
+      return { ...m, avg, total, counts };
+    }).sort((a, b) => b.avg - a.avg); // The most important line: Ranking them
+
+    addChart('mentor-dist-chart', {
+      type: 'bar',
+      data: {
+        labels: sortedMentorData.map(m => m.name),
+        datasets: [0, 1, 2, 3, 4].map(idx => {
+          const colors = ['#FF0000', '#A855F7', '#FFFF00', '#0000FF', '#008000'];
+          const ratingVal = idx + 1;
+          return {
+            label: `Rating ${ratingVal}`,
+            data: sortedMentorData.map(m => m.counts[idx].pct),
+            backgroundColor: colors[idx],
+            barThickness: 28
+          };
+        })
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+            padding: {
+                right: 100,
+                left: 10
+            }
+        },
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#96948d', font: { weight: 700 } } },
+          tooltip: {
+            callbacks: {
+              // Show the ACTUAL count in the tooltip so data accuracy is kept
+              label: (ctx) => {
+                const mentor = sortedMentorData[ctx.dataIndex];
+                const ratingObj = mentor.counts[ctx.datasetIndex];
+                return ` Rating ${ratingObj.val}: ${ratingObj.pct.toFixed(1)}% (${ratingObj.count} votes)`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: { 
+            stacked: true, 
+            max: 100, // Forces 100% width
+            ticks: { callback: v => v + '%', color: '#6f706a' },
+            grid: { color: '#343531' }
+          },
+          y: { 
+            stacked: true, 
+            grid: { display: false },
+            ticks: { color: '#f1f0eb', font: { weight: 800, size: 13 } } 
+          }
+        }
+      },
+      plugins: [{
+        id: 'barLabels',
+        afterDatasetsDraw(chart) {
+          const { ctx, data, scales: { y } } = chart;
+          ctx.save();
+          ctx.font = 'bold 14px Inter';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+
+          sortedMentorData.forEach((m, i) => {
+            const barMeta = chart.getDatasetMeta(0).data[i];
+            if (!barMeta) return;
+            const barY = barMeta.y;
+            const xPos = chart.chartArea.right + 15;
+            ctx.fillStyle = '#f1f0eb';
+            ctx.font = 'bold 14px Inter';
+            ctx.fillText(`${m.avg.toFixed(2)} avg`, xPos, barY - 8);
+            ctx.fillStyle = '#96948d';
+            ctx.font = '700 11px Inter';
+            ctx.fillText(`${m.total} responses`, xPos, barY + 10);
+            });
+          ctx.restore();
+        }
+      }]
+    });
+
+  } else {
+    ['mentor-bar-chart','mentor-dist-chart'].forEach(id => showChartMessage(id, 'No mentor audit data available.'));
+  }
+  resizeCharts();
+}
+
+setTimeout(renderDashboard, 500);
+
+window.sw = function(id, el) {
+  document.querySelectorAll('.pnl').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
+  const target = document.getElementById(id);
+  if(target) target.classList.add('on');
+  if(el) el.classList.add('on');
+  resizeCharts();
+}
+</script>
