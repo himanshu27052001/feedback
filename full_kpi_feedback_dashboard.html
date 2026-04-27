@@ -426,9 +426,48 @@
   .score-track { background:#292a26; border-radius:4px; height:22px; overflow:hidden; }
   .score-fill { height:100%; border-radius:4px; min-width: 4px; }
   .score-count { color: var(--color-text-primary); font-size:13px; font-weight:900; line-height:1.15; text-align:right; white-space: nowrap; }
+  .comment-grid { display:grid; gap:16px; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.45fr); }
+  .comment-table { border-collapse: collapse; width: 100%; }
+  .comment-table th {
+    background: #2d2e2a;
+    color: var(--color-text-primary);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0;
+    padding: 12px 13px;
+    text-align: left;
+    text-transform: uppercase;
+  }
+  .comment-table td {
+    border-top: 1px solid #3a3b36;
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.5;
+    padding: 12px 13px;
+    vertical-align: top;
+  }
+  .comment-table tr:hover td { background: #282925; color: var(--color-text-primary); }
+  .urgency-chip {
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 11px;
+    font-weight: 900;
+    line-height: 1;
+    padding: 6px 9px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .urgency-high { background: rgba(183,47,50,.18); color: #ff9b9d; }
+  .urgency-medium { background: rgba(199,122,12,.18); color: #f5bd6b; }
+  .sentiment-critical { color: #ff9b9d; font-weight: 900; }
+  .sentiment-positive { color: #9fbd2e; font-weight: 900; }
+  .sentiment-moderate { color: #f5bd6b; font-weight: 900; }
+  .sentiment-mixed { color: #7fb3e6; font-weight: 900; }
   @media (max-width: 900px) {
     .dashboard { padding: 24px; }
     .grid-stats { grid-template-columns: repeat(2, 1fr); }
+    .comment-grid { grid-template-columns: 1fr; }
   }
 </style>
 
@@ -458,6 +497,7 @@
   <button class="nb" onclick="sw('p3',this)">subject rankings</button>
   <button class="nb" onclick="sw('p6',this)">mentor audit</button>
   <button class="nb" onclick="sw('p7',this)">timing</button>
+  <button class="nb" onclick="sw('p8',this)">comments</button>
 </div>
 
 <div id="p0" class="pnl on">
@@ -686,6 +726,104 @@
 
   <div class="callout callout-info" style="margin-top: 1.5rem;">
     <strong>Structural Note:</strong> The 2pm–3pm dip suggests a non-linear exit flow. This points to batch scheduling gaps where students are either rushed out or held significantly longer than the average exit window.
+  </div>
+</div>
+
+<div id="p8" class="pnl">
+  <div class="callout callout-info" style="margin-bottom: 20px;">
+    <span class="insight-title" style="color: #1f6fb2;">Qualitative Feedback</span>
+    <strong>Comment themes point to operational heat stress, facility fixes, punctual dispatch, and teacher-specific delivery gaps.</strong> Use this panel alongside the score views to separate system issues from faculty coaching issues.
+  </div>
+
+  <div class="comment-grid">
+    <div class="card">
+      <div class="card-title">Primary Student Requests</div>
+      <div class="tbl-container">
+        <table class="comment-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Primary Issue / Request</th>
+              <th>Urgency</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Timings</td>
+              <td>Shift 2:30/3:30 PM batches to 4:30 PM due to heatwaves.</td>
+              <td><span class="urgency-chip urgency-high">High</span></td>
+            </tr>
+            <tr>
+              <td>Facilities</td>
+              <td>Deep clean and repair washrooms, including urinals and seats.</td>
+              <td><span class="urgency-chip urgency-high">High</span></td>
+            </tr>
+            <tr>
+              <td>Logistics</td>
+              <td>Dismiss classes exactly on time to avoid transport delays.</td>
+              <td><span class="urgency-chip urgency-medium">Medium</span></td>
+            </tr>
+            <tr>
+              <td>Materials</td>
+              <td>Provide bound books instead of loose paper notes.</td>
+              <td><span class="urgency-chip urgency-medium">Medium</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Faculty-wise Student Comments</div>
+      <div class="tbl-container">
+        <table class="comment-table">
+          <thead>
+            <tr>
+              <th>Faculty</th>
+              <th>Subject</th>
+              <th>Student Sentiment & Specific Comments</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Aniket Sir</td>
+              <td>Math</td>
+              <td><span class="sentiment-positive">Exceptional.</span> Students find him energetic, clear, and fruitful. Students requested he take over all Math chapters.</td>
+            </tr>
+            <tr>
+              <td>Kuldeep Sir</td>
+              <td>Math</td>
+              <td><span class="sentiment-positive">Positive.</span> Generally liked, though some students prefer Aniket Sir's assignment-solving style over his.</td>
+            </tr>
+            <tr>
+              <td>Dhulesh Sir</td>
+              <td>Math</td>
+              <td><span class="sentiment-critical">Needs support.</span> Students find him nice for 1:1 sessions, but difficult to follow during regular group classes.</td>
+            </tr>
+            <tr>
+              <td>Kapil Sir</td>
+              <td>General</td>
+              <td><span class="sentiment-moderate">Moderate.</span> Students see scope for improvement, though some feel he moves a bit fast.</td>
+            </tr>
+            <tr>
+              <td>Vibha Ma'am</td>
+              <td>Biology</td>
+              <td><span class="sentiment-mixed">Mixed.</span> Acknowledged as very experienced, but students find the lectures boring or not their type. Request for more joyful and energetic delivery.</td>
+            </tr>
+            <tr>
+              <td>Aayushi Ma'am</td>
+              <td>English</td>
+              <td><span class="sentiment-critical">Critical.</span> Students report low energy and difficulty understanding grammar topics.</td>
+            </tr>
+            <tr>
+              <td>Chetna Ma'am</td>
+              <td>Geo/Eco</td>
+              <td><span class="sentiment-critical">Critical.</span> Students struggle to understand the topics and find the class uninteresting. Strong request for Shreyash Sir to return.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
 
