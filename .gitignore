@@ -7,3 +7,4 @@ scratch
 *.zip
 column_mapping.txt
 debug_mentor.txt
+dist/

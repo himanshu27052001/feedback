@@ -1,16 +1,20 @@
 # Student Feedback Dashboard
 
-Flask dashboard for analyzing student feedback across batches, teachers, mentors, timing, and score distribution.
+Cloudflare Workers dashboard for analyzing student feedback across batches, teachers, mentors, timing, and score distribution.
+
+The analytics are built locally from SQLite into static HTML/JSON. Cloudflare Workers serves those generated assets in production, so the edge runtime does not need Python, pandas, Flask, or SQLite.
 
 ## Required Files
 
 These files are needed to run the dashboard:
 
-- `app.py` - Flask backend and data aggregation logic.
+- `app.py` - build-time data aggregation and static renderer.
 - `feedback.db` - main SQLite database containing `student_feedback`.
 - `mentor.db` - optional for the app to start, but required for Mentor Audit data.
 - `full_kpi_feedback_dashboard.html` - main dashboard template.
 - `beautiful_feedback_report.html` - insight report template.
+- `src/worker.js` - Cloudflare Worker route adapter.
+- `wrangler.toml` - Worker deployment configuration.
 - `requirements.txt` or `pyproject.toml` - Python dependencies.
 
 Useful supporting files:
@@ -37,18 +41,40 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-## Run The Dashboard
+## Build The Dashboard
 
 From the project root:
 
 ```powershell
-.\.venv\Scripts\python.exe app.py
+npm run build
 ```
 
-Open:
+This creates:
 
 ```text
-http://127.0.0.1:5000/full
+dist/full.html
+dist/report.html
+dist/data.json
+```
+
+## Preview Or Deploy On Cloudflare Workers
+
+Install the Node dependencies once:
+
+```powershell
+npm install
+```
+
+Preview locally through Wrangler:
+
+```powershell
+npm run preview
+```
+
+Deploy:
+
+```powershell
+npm run deploy
 ```
 
 The root URL `/` redirects to `/full`.
@@ -75,6 +101,7 @@ Then run the dashboard again:
 
 ## Notes
 
-- The dashboard reads directly from `feedback.db`.
+- Production requests are served by Cloudflare Workers from `dist/`.
+- Re-run `npm run build` whenever `feedback.db`, `mentor.db`, or the templates change.
 - Mentor charts require `mentor.db` with a `student_mentor` table.
-- `chart_queries.sql` is not required by Flask at runtime; it documents the SQL behind the dashboard metrics.
+- `chart_queries.sql` is not required at runtime; it documents the SQL behind the dashboard metrics.

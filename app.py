@@ -1,4 +1,3 @@
-from flask import Flask, render_template, jsonify, redirect, url_for
 try:
     import pysqlite3 as sqlite3
     import sys
@@ -9,11 +8,12 @@ except ImportError:
 import pandas as pd
 import json
 import os
+from pathlib import Path
 
-app = Flask(__name__, template_folder='.')
-
-DB_PATH = 'feedback.db'
-MENTOR_DB_PATH = 'mentor.db'
+BASE_DIR = Path(__file__).resolve().parent
+DB_PATH = BASE_DIR / 'feedback.db'
+MENTOR_DB_PATH = BASE_DIR / 'mentor.db'
+DIST_DIR = BASE_DIR / 'dist'
 
 TEACHERS = {
     "Asawari Ma'am": "Chemistry",
@@ -34,28 +34,6 @@ def get_db_connection():
     if os.path.exists(MENTOR_DB_PATH):
         conn.execute(f"ATTACH DATABASE '{MENTOR_DB_PATH}' AS mdb")
     return conn
-
-try:
-    with get_db_connection() as _c:
-        _mt = _c.execute("SELECT * FROM mdb.student_mentor LIMIT 10").fetchall()
-        _st = _c.execute("SELECT name FROM PRAGMA_TABLE_INFO('student_feedback')").fetchall()
-        
-        # Determine the batch col dynamically to get values
-        cols = [x[0] for x in _st]
-        b_col = next((c for c in cols if 'class_batch' in c.lower() or 'batch' in c.lower()), None)
-        _sb = _c.execute(f"SELECT DISTINCT \"{b_col}\" FROM student_feedback LIMIT 10").fetchall() if b_col else []
-        
-        import os
-        debug_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'debug_mentor.txt')
-        with open(debug_path, 'w') as _f:
-            _f.write(f"Columns: {cols}\n")
-            _f.write(f"Mentor batches: {_mt}\n")
-            _f.write(f"Feedback batches: {_sb}\n")
-except Exception as e:
-    import os
-    debug_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'debug_mentor.txt')
-    with open(debug_path, 'w') as _f:
-        _f.write(f"Debug error: {e}\n")
 
 def get_schema_info(conn):
     cursor = conn.execute("SELECT * FROM student_feedback LIMIT 1")
@@ -340,25 +318,62 @@ def get_dashboard_data():
     finally:
         conn.close()
 
-@app.route('/')
-def index():
-    return redirect(url_for('full'))
+def _json(value):
+    return json.dumps(value, ensure_ascii=False, separators=(',', ':'))
 
-@app.route('/report')
-def report():
-    try:
-        data = get_dashboard_data()
-        return render_template('beautiful_feedback_report.html', **data)
-    except Exception as e:
-        return f"Error: {e}"
+def _render_template(template_name, data):
+    html = (BASE_DIR / template_name).read_text(encoding='utf-8')
 
-@app.route('/full')
-def full():
-    try:
-        data = get_dashboard_data()
-        return render_template('full_kpi_feedback_dashboard.html', **data)
-    except Exception as e:
-        return f"Error: {e}"
+    json_keys = {
+        'batches': data['batches'],
+        'batchN': data['batchN'],
+        'teachers': data['teachers'],
+        'data': data['data'],
+        'infraData': data['infraData'],
+        'TS': data['TS'],
+        'batchScores': data['batchScores'],
+        'timing': data['timing'],
+        'mentorData': data['mentorData'],
+        'summary': data['summary'],
+    }
+    for key, value in json_keys.items():
+        html = html.replace(f'{{{{ {key} | tojson | safe }}}}', _json(value))
+
+    scalar_replacements = {
+        '{{ summary.total }}': str(data['summary']['total']),
+        '{{ summary.g10_b + summary.g9_b }}': str(data['summary']['g10_b'] + data['summary']['g9_b']),
+        "{{ '%.2f'|format(coreMetrics.institute_avg) }}": f"{data['coreMetrics']['institute_avg']:.2f}",
+        "{{ '%.1f'|format(coreMetrics.promoter_rate) }}": f"{data['coreMetrics']['promoter_rate']:.1f}",
+        "{{ '%.1f'|format(coreMetrics.detractor_rate) }}": f"{data['coreMetrics']['detractor_rate']:.1f}",
+        '{{ coreMetrics.teachers_above_4 }}': str(data['coreMetrics']['teachers_above_4']),
+        '{{ coreMetrics.teacher_count }}': str(data['coreMetrics']['teacher_count']),
+        '{{ coreMetrics.weakest_parameter }}': str(data['coreMetrics']['weakest_parameter']),
+        "{{ '%.2f'|format(coreMetrics.weakest_parameter_score) }}": f"{data['coreMetrics']['weakest_parameter_score']:.2f}",
+        "{{ '%.2f'|format(coreMetrics.g10_avg) }}": f"{data['coreMetrics']['g10_avg']:.2f}",
+        '{{ summary.g10_b }}': str(data['summary']['g10_b']),
+        '{{ summary.g10 }}': str(data['summary']['g10']),
+        "{{ '%.2f'|format(coreMetrics.g9_avg) }}": f"{data['coreMetrics']['g9_avg']:.2f}",
+        '{{ summary.g9_b }}': str(data['summary']['g9_b']),
+        '{{ summary.g9 }}': str(data['summary']['g9']),
+    }
+    for token, value in scalar_replacements.items():
+        html = html.replace(token, value)
+
+    return html
+
+def build_static_site():
+    data = get_dashboard_data()
+    DIST_DIR.mkdir(exist_ok=True)
+    (DIST_DIR / 'full.html').write_text(
+        _render_template('full_kpi_feedback_dashboard.html', data),
+        encoding='utf-8'
+    )
+    (DIST_DIR / 'report.html').write_text(
+        _render_template('beautiful_feedback_report.html', data),
+        encoding='utf-8'
+    )
+    (DIST_DIR / 'data.json').write_text(_json(data), encoding='utf-8')
+    print(f"Built Cloudflare Worker assets in {DIST_DIR}")
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    build_static_site()

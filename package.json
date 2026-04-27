@@ -1,0 +1,14 @@
+{
+  "name": "feedback-dashboard-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "uv run python app.py",
+    "deploy": "npm run build && wrangler deploy",
+    "preview": "npm run build && wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "^4.13.0"
+  }
+}
