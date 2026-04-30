@@ -527,20 +527,20 @@
   <!-- Top Priority: The Masking Effect -->
   <div class="callout callout-danger" style="margin-bottom: 1.5rem; display: block !important;">
     <span class="insight-title" style="color: #b72f32;">Critical: Faculty Performance Gap</span>
-    <strong>Only 5 of 11 teachers score above 4.0.</strong> The institute average of 4.00 is being held up by a small group of high performers masking significant underperformance across the remaining 6 faculty members.
+    {{ insights.faculty_gap | safe }}
   </div>
 
   <div class="insight-grid">
     <!-- Critical: Systemic Engagement Gap -->
     <div class="callout callout-warning">
       <span class="insight-title" style="color: #c77a0c;">Systemic Issue: Engagement</span>
-      <strong>Engagement is the weakest parameter at 3.95/5.</strong> Across all 11 teachers, engagement scores lower than vibe and approachability without exception. This is a training gap, not an individual failure.
+      {{ insights.weakest_parameter | safe }}
     </div>
 
     <!-- High Value: Detractor Concentration -->
     <div class="callout callout-warning">
       <span class="insight-title" style="color: #c77a0c;">Retention Risk: Detractors</span>
-      <strong>11.1% detractor rate (1 in 9 ratings).</strong> This represents ~1,065 dissatisfied responses. These are heavily concentrated in 2–3 teachers but drag the entire institute's reputation down.
+      {{ insights.detractors | safe }}
     </div>
   </div>
 </div>
@@ -548,10 +548,10 @@
 <div id="p1" class="pnl">
   <div class="rankings-insights">
     <div class="insight-pill pill-urgent">
-      <strong>URGENT:</strong> Chetna Ma'am's 3.03 engagement is a critical outlier. Immediate delivery intervention required.
+      {{ insights.urgent_teacher | safe }}
     </div>
     <div class="insight-pill pill-benchmark">
-      <strong>BENCHMARK:</strong> Aniket Sir (4.45) provides the model for high-engagement/high-vibe teaching at scale.
+      {{ insights.benchmark_teacher | safe }}
     </div>
   </div>
   <div class="card">
@@ -591,11 +591,11 @@
       <div style="display: flex; flex-direction: column; gap: 12px; padding-top: 40px;">
         <div class="callout callout-danger" style="font-size: 13px;">
           <span class="insight-title" style="color: #b72f32;">Critical: Subject Isolation</span>
-          <strong>Geo/Eco (3.27)</strong> is pulling the institute average down. As a single-teacher subject, there is no internal peer-learning buffer; individual performance is the subject average.
+          {{ insights.subject_isolation | safe }}
         </div>
         <div class="callout callout-warning" style="font-size: 13px;">
           <span class="insight-title" style="color: #c77a0c;">Departmental Decay</span>
-          <strong>English (3.75)</strong> is the only multi-teacher subject below the 4.0 benchmark. This points to a curriculum or departmental issue rather than just one teacher.
+          {{ insights.departmental | safe }}
         </div>
       </div>
     </div>
@@ -605,7 +605,7 @@
       <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px;">
         <p class="faculty-chart-title" style="margin: 0;">Subject-wise faculty rankings</p>
         <div class="insight-pill pill-urgent" style="max-width: 500px; font-size: 12px;">
-          <strong>Maths Variance:</strong> 0.80-point spread between Aniket Sir (4.45) and Kapil/Dhulesh (3.65). This is a "Maths Lottery" where student experience depends entirely on teacher assignment.
+          {{ insights.maths_variance | safe }}
         </div>
       </div>
       <div class="subject-tables" id="subject-ranking-tables"></div>
@@ -621,7 +621,7 @@
       <div style="display: flex; flex-direction: column; gap: 12px; padding-top: 40px;">
         <div class="callout callout-info" style="font-size: 13px;">
           <span class="insight-title" style="color: #1f6fb2;">Diagnostic: 9th/10th Gap</span>
-          <strong>Hist/Pol Sci</strong> shows the largest gap (3.4 vs 4.3). Shreyash Sir excels with 10th grade but performance collapses in 9th. Suggests a connection or curriculum mismatch with younger students.
+          {{ insights.grade_gap | safe }}
         </div>
       </div>
     </div>
@@ -633,10 +633,10 @@
   <div class="card">
     <div class="insight-grid" style="margin-bottom: 20px;">
     <div class="callout callout-danger">
-      <strong>BATCH ALERT (9B3A):</strong> Systemic performance collapse across 4 subjects. Indicates a batch-level culture issue, not individual teacher failure.
+      {{ insights.batch_alert | safe }}
     </div>
     <div class="callout callout-warning">
-      <strong>CONSISTENCY CHECK:</strong> Shreyash Sir shows extreme variance (4.7 vs 3.1). Performance is highly dependent on batch dynamics; requires adaptability coaching.
+      {{ insights.consistency | safe }}
     </div>
     </div>
     <div class="card-title">Teacher x Batch Heatmap (Overall Avg)</div>
@@ -670,19 +670,19 @@
   <div class="insight-grid" style="margin-bottom: 24px;">
     <div class="callout callout-success">
       <span class="insight-title" style="color: #3b7d0f;">Benchmark: Dual-Threat Leadership</span>
-      <strong>Raj Sir</strong> leads both KPIs. He maintains a high-control classroom (minimal Red/Orange) while remaining the most approachable mentor. This is the institutional target.
+      {{ insights.mentor_leadership | safe }}
     </div>
 
     <!-- The "Nice Guy" Diagnostic -->
     <div class="callout callout-warning">
       <span class="insight-title" style="color: #c77a0c;">Diagnostic: Authority vs. Approachability</span>
-      <strong>Kuldip Sir</strong> shows a "Nice Guy" profile: High approachability but compressed class control. Effective mentoring requires authority; approachability alone is insufficient for a productive environment.
+      {{ insights.mentor_authority | safe }}
     </div>
   </div>
 
   <div class="callout callout-danger" style="margin-bottom: 24px;">
-    <span class="insight-title" style="color: #b72f32;">Urgent: "Zoo Energy" Alert</span>
-    <strong>Priyanshu Sir and Sangini Ma'am</strong> have the highest detractor rates in Class Control. Red/Orange segments indicate a subset of students find these environments chaotic and unproductive. 
+    <span class="insight-title" style="color: #b72f32;">Urgent: Class-Control Risk</span>
+    {{ insights.mentor_detractors | safe }}
   </div>
 
   <div class="grid-2">
@@ -705,13 +705,13 @@
     <!-- The Data Quality Warning -->
     <div class="callout callout-warning">
       <span class="insight-title" style="color: #c77a0c;">Data Audit Required</span>
-      <strong>Before 11am spike (~175 students)</strong> represents 33% of the data. We need to verify if these are actual morning batches or "first-box" click-through errors before using this for scheduling decisions.
+      {{ insights.timing_spike | safe }}
     </div>
 
     <!-- The Actionable Fatigue Insight -->
     <div class="callout callout-danger">
       <span class="insight-title" style="color: #b72f32;">Retention Risk: Fatigue</span>
-      <strong>10% of students reach home after 3pm.</strong> There is likely a direct correlation between this late-arrival cohort and the "Detractor" ratings in the Teacher KPI section. Summer heat + late arrivals = engagement collapse.
+      {{ insights.fatigue | safe }}
     </div>
   </div>
 

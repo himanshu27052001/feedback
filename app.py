@@ -378,6 +378,186 @@ def _render_score_distribution(score_distribution):
         'rows': '\n      '.join(rows),
     }
 
+def _subject_insights(teacher_stats):
+    grouped = {}
+    for teacher in teacher_stats:
+        grouped.setdefault(teacher['s'], []).append(teacher)
+
+    subjects = []
+    for subject, teachers in grouped.items():
+        weight = sum(max(t.get('rc', 0), 1) for t in teachers)
+        avg = sum(t['ov'] * max(t.get('rc', 0), 1) for t in teachers) / weight if weight else 0
+        grades = {'9th': {'score': 0, 'weight': 0}, '10th': {'score': 0, 'weight': 0}}
+        for teacher in teachers:
+            for batch, batch_data in teacher.get('bb', {}).items():
+                grade = '10th' if '10' in batch else '9th' if '9' in batch else None
+                if not grade:
+                    continue
+                vals = [
+                    batch_data.get('v'),
+                    batch_data.get('a'),
+                    batch_data.get('e'),
+                ]
+                vals = [float(v) for v in vals if v is not None]
+                count = int(batch_data.get('n') or 0)
+                if not vals or count <= 0:
+                    continue
+                grades[grade]['score'] += (sum(vals) / len(vals)) * count
+                grades[grade]['weight'] += count
+
+        subject_teachers = sorted(teachers, key=lambda item: item['ov'], reverse=True)
+        subjects.append({
+            'subject': subject,
+            'avg': avg,
+            'teachers': subject_teachers,
+            'grade9': grades['9th']['score'] / grades['9th']['weight'] if grades['9th']['weight'] else None,
+            'grade10': grades['10th']['score'] / grades['10th']['weight'] if grades['10th']['weight'] else None,
+        })
+
+    return sorted(subjects, key=lambda item: item['avg'], reverse=True)
+
+def _render_insights(data):
+    core = data['coreMetrics']
+    teacher_stats = data['TS']
+    score_distribution = data['scoreDistribution']
+    timing = data['timing']
+    mentors = data['mentorData']
+    subjects = _subject_insights(teacher_stats)
+    total_ratings = sum(item['count'] for item in score_distribution)
+    detractor_count = sum(item['count'] for item in score_distribution if item['rating'] in (1, 2))
+    detractor_pct = (detractor_count * 100.0 / total_ratings) if total_ratings else 0
+    one_in = round(100 / detractor_pct) if detractor_pct else 0
+
+    lowest_engagement = min(teacher_stats, key=lambda item: item['e'])
+    top_teacher = max(teacher_stats, key=lambda item: item['ov'])
+    lowest_subject = min(subjects, key=lambda item: item['avg'])
+    multi_subjects = [subject for subject in subjects if len(subject['teachers']) > 1]
+    lowest_multi = min(multi_subjects, key=lambda item: item['avg']) if multi_subjects else lowest_subject
+
+    maths = next((subject for subject in subjects if subject['subject'] == 'Maths'), None)
+    maths_teachers = maths['teachers'] if maths else []
+    maths_top = maths_teachers[0] if maths_teachers else None
+    maths_bottom = maths_teachers[-1] if maths_teachers else None
+    maths_spread = (maths_top['ov'] - maths_bottom['ov']) if maths_top and maths_bottom else 0
+
+    grade_gaps = [
+        subject for subject in subjects
+        if subject['grade9'] is not None and subject['grade10'] is not None
+    ]
+    grade_gap = max(grade_gaps, key=lambda item: abs(item['grade9'] - item['grade10'])) if grade_gaps else None
+
+    low_batch_counts = {}
+    variances = []
+    for teacher in teacher_stats:
+        batch_scores = []
+        for batch, batch_data in teacher.get('bb', {}).items():
+            vals = [
+                batch_data.get('v'),
+                batch_data.get('a'),
+                batch_data.get('e'),
+            ]
+            vals = [float(v) for v in vals if v is not None]
+            if not vals:
+                continue
+            score = sum(vals) / len(vals)
+            batch_scores.append((batch, score))
+            if score < 3.8:
+                low_batch_counts[batch] = low_batch_counts.get(batch, 0) + 1
+        if len(batch_scores) > 1:
+            high = max(batch_scores, key=lambda item: item[1])
+            low = min(batch_scores, key=lambda item: item[1])
+            variances.append((high[1] - low[1], teacher['n'], high, low))
+    batch_alert = max(low_batch_counts.items(), key=lambda item: item[1]) if low_batch_counts else ('N/A', 0)
+    consistency = max(variances, key=lambda item: item[0]) if variances else (0, 'N/A', ('N/A', 0), ('N/A', 0))
+
+    timing_total = sum(timing)
+    before_11 = timing[0] if len(timing) > 0 else 0
+    after_3 = timing[5] if len(timing) > 5 else 0
+    before_11_pct = (before_11 * 100.0 / timing_total) if timing_total else 0
+    after_3_pct = (after_3 * 100.0 / timing_total) if timing_total else 0
+
+    mentor_top_approach = max(mentors, key=lambda item: item['approach']) if mentors else None
+    mentor_top_control = max(mentors, key=lambda item: item['mgmt']) if mentors else None
+    mentor_low_control = min(mentors, key=lambda item: item['mgmt']) if mentors else None
+    def control_detractor_pct(mentor):
+        ratings = mentor.get('mgmt_dist', [])
+        return sum(1 for rating in ratings if round(rating) <= 2) * 100.0 / len(ratings) if ratings else 0
+    mentor_detractors = sorted(mentors, key=control_detractor_pct, reverse=True)[:2]
+
+    below_count = core['teacher_count'] - core['teachers_above_4']
+    return {
+        'faculty_gap': (
+            f"<strong>{core['teachers_above_4']} of {core['teacher_count']} teachers score above 4.0.</strong> "
+            f"The institute average is {core['institute_avg']:.2f}; the remaining {below_count} faculty members are the clearest coaching priority."
+        ),
+        'weakest_parameter': (
+            f"<strong>{core['weakest_parameter']} is the weakest parameter at {core['weakest_parameter_score']:.2f}/5.</strong> "
+            "It is still above the 4.0 benchmark, so the current task is refinement rather than rescue."
+        ),
+        'detractors': (
+            f"<strong>{detractor_pct:.1f}% of all ratings are detractors (about 1 in {one_in}).</strong> "
+            f"That is {detractor_count:,} low-score ratings across the teacher dimensions; the risk is concentrated in the lowest-scoring faculty and batches."
+        ),
+        'urgent_teacher': (
+            f"<strong>URGENT:</strong> {lowest_engagement['n']}'s {lowest_engagement['e']:.2f} engagement score is the lowest faculty metric. Immediate delivery support is the priority."
+        ),
+        'benchmark_teacher': (
+            f"<strong>BENCHMARK:</strong> {top_teacher['n']} ({top_teacher['ov']:.2f}) provides the model for high-engagement/high-vibe teaching at scale."
+        ),
+        'subject_isolation': (
+            f"<strong>{lowest_subject['subject']} ({lowest_subject['avg']:.2f})</strong> is the lowest subject average. "
+            "As a single-teacher subject, there is no internal peer-learning buffer; individual performance is the subject average."
+        ),
+        'departmental': (
+            f"<strong>{lowest_multi['subject']} ({lowest_multi['avg']:.2f})</strong> is the lowest multi-teacher subject. "
+            "It is close to the benchmark, but the internal spread still points to a department-level consistency issue."
+        ),
+        'maths_variance': (
+            f"<strong>Maths Variance:</strong> {maths_spread:.2f}-point spread between {maths_top['n']} ({maths_top['ov']:.2f}) "
+            f"and {maths_bottom['n']} ({maths_bottom['ov']:.2f}). Student experience depends heavily on teacher assignment."
+            if maths_top and maths_bottom else "<strong>Maths Variance:</strong> Not enough Maths data to calculate a spread."
+        ),
+        'grade_gap': (
+            f"<strong>{grade_gap['subject']}</strong> shows the largest 9th/10th gap ({grade_gap['grade9']:.2f} vs {grade_gap['grade10']:.2f}). "
+            "Use this as a curriculum-fit check before making teacher-level conclusions."
+            if grade_gap else "<strong>Grade gap:</strong> Not enough cross-grade subject data to compare 9th and 10th."
+        ),
+        'batch_alert': (
+            f"<strong>BATCH ALERT ({batch_alert[0]}):</strong> {batch_alert[1]} faculty-batch cells fall below 3.8. "
+            "This points to a batch-level culture or scheduling issue alongside individual coaching needs."
+        ),
+        'consistency': (
+            f"<strong>CONSISTENCY CHECK:</strong> {consistency[1]} shows the widest batch swing "
+            f"({consistency[2][1]:.2f} in {consistency[2][0]} vs {consistency[3][1]:.2f} in {consistency[3][0]}). "
+            "Performance is highly dependent on batch dynamics; adaptability coaching is needed."
+        ),
+        'mentor_leadership': (
+            f"<strong>{mentor_top_approach['name']}</strong> leads approachability at {mentor_top_approach['approach']:.2f}, "
+            f"while <strong>{mentor_top_control['name']}</strong> leads class control at {mentor_top_control['mgmt']:.2f}. "
+            "Together, these are the two mentor benchmarks to study."
+            if mentor_top_approach and mentor_top_control else "<strong>Mentor benchmark:</strong> No mentor audit data available."
+        ),
+        'mentor_authority': (
+            f"<strong>{mentor_low_control['name']}</strong> has the lowest class-control score ({mentor_low_control['mgmt']:.2f}) despite "
+            f"{mentor_low_control['approach']:.2f} approachability. Effective mentoring needs warmth and authority together."
+            if mentor_low_control else "<strong>Authority vs. Approachability:</strong> No mentor audit data available."
+        ),
+        'mentor_detractors': (
+            f"<strong>{mentor_detractors[0]['name']} and {mentor_detractors[1]['name']}</strong> have the highest class-control detractor rates "
+            f"({control_detractor_pct(mentor_detractors[0]):.1f}% and {control_detractor_pct(mentor_detractors[1]):.1f}%). "
+            "Red/Orange segments indicate a subset of students find these environments chaotic and unproductive."
+            if len(mentor_detractors) >= 2 else "<strong>Class-control risk:</strong> No mentor distribution data available."
+        ),
+        'timing_spike': (
+            f"<strong>Before 11am spike ({before_11} students)</strong> represents {before_11_pct:.0f}% of the data. "
+            "Verify if these are actual morning returns or first-box click-through errors before using this for scheduling decisions."
+        ),
+        'fatigue': (
+            f"<strong>{after_3_pct:.1f}% of students reach home after 3pm.</strong> "
+            "This late-arrival cohort should be checked against teacher detractor ratings and heat-related comments."
+        ),
+    }
+
 def _render_template(template_name, data):
     html = (BASE_DIR / template_name).read_text(encoding='utf-8')
 
@@ -398,6 +578,7 @@ def _render_template(template_name, data):
         html = html.replace(f'{{{{ {key} | tojson | safe }}}}', _json(value))
 
     score_distribution_html = _render_score_distribution(data['scoreDistribution'])
+    insight_replacements = _render_insights(data)
     scalar_replacements = {
         '{{ summary.total }}': str(data['summary']['total']),
         '{{ scoreDistribution.title }}': score_distribution_html['title'],
@@ -418,6 +599,10 @@ def _render_template(template_name, data):
         '{{ summary.g9_b }}': str(data['summary']['g9_b']),
         '{{ summary.g9 }}': str(data['summary']['g9']),
     }
+    scalar_replacements.update({
+        f'{{{{ insights.{key} | safe }}}}': value
+        for key, value in insight_replacements.items()
+    })
     for token, value in scalar_replacements.items():
         html = html.replace(token, value)
 
