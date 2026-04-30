@@ -898,8 +898,9 @@ function renderHeatmap(){
       const d=t.bb[b];
       const v=heatmapValue(d, metrics);
       const n=d?d.n:0;
-      const label = v ? v.toFixed(1) : '-';
-      const title = v ? `${t.n} / ${b}: ${v.toFixed(2)} ${metricName} avg from ${n} responses` : `${t.n} / ${b}: no ratings`;
+      const hasValue = Number.isFinite(v);
+      const label = hasValue ? v.toFixed(1) : 'N/A';
+      const title = hasValue ? `${t.n} / ${b}: ${v.toFixed(2)} ${metricName} avg from ${n} responses` : `${t.n} / ${b}: no ratings`;
       hh+=`<td><span class="hcell" title="${title}" style="background:${hmClr(v,n)};">${label}</span></td>`;
     });
     hh+='</tr>';
