@@ -223,6 +223,43 @@ def get_core_metrics(conn, batch_col, vibe_map, comfort_map, interest_map):
         'weakest_parameter_score': round(float(weakest_score), 2) if weakest_score else 0
     }
 
+def get_score_distribution(conn, vibe_map, comfort_map, interest_map):
+    rating_cols = []
+    for t_name in TEACHERS:
+        rating_cols.extend([vibe_map[t_name], comfort_map[t_name], interest_map[t_name]])
+    rating_cols = [c for c in rating_cols if c]
+    if not rating_cols:
+        return []
+
+    df = pd.read_sql_query(
+        "SELECT " + ", ".join([f'"{c}"' for c in rating_cols]) + " FROM student_feedback",
+        conn
+    )
+    for col in rating_cols:
+        df[col] = pd.to_numeric(df[col], errors='coerce')
+
+    ratings = df[rating_cols].stack().dropna().round().astype(int)
+    ratings = ratings[(ratings >= 1) & (ratings <= 5)]
+    total = int(len(ratings))
+    counts = ratings.value_counts()
+    colors = {
+        5: '#059669',
+        4: '#2563eb',
+        3: '#64748b',
+        2: '#d97706',
+        1: '#dc2626',
+    }
+
+    return [
+        {
+            'rating': rating,
+            'count': int(counts.get(rating, 0)),
+            'percent': round((int(counts.get(rating, 0)) * 100.0 / total), 1) if total else 0,
+            'color': colors[rating],
+        }
+        for rating in range(5, 0, -1)
+    ]
+
 def get_mentor_audit(conn, batch_col, infra_cols):
     mentor_data = []
     try:
@@ -296,6 +333,7 @@ def get_dashboard_data():
         teacher_stats = get_teacher_stats(conn, vibe_map, comfort_map, interest_map)
         teacher_batch, batch_scores = get_batch_teacher_stats(conn, batch_col, vibe_map, comfort_map, interest_map)
         core_metrics = get_core_metrics(conn, batch_col, vibe_map, comfort_map, interest_map)
+        score_distribution = get_score_distribution(conn, vibe_map, comfort_map, interest_map)
         for teacher in teacher_stats:
             teacher["bb"] = teacher_batch.get(teacher["n"], {})
         mentor_data = get_mentor_audit(conn, batch_col, infra_cols)
@@ -311,6 +349,7 @@ def get_dashboard_data():
             'infraData': infra_data,
             'summary': summary,
             'coreMetrics': core_metrics,
+            'scoreDistribution': score_distribution,
             'TS': teacher_stats,
             'timing': timing_data,
             'mentorData': mentor_data
@@ -320,6 +359,24 @@ def get_dashboard_data():
 
 def _json(value):
     return json.dumps(value, ensure_ascii=False, separators=(',', ':'))
+
+def _render_score_distribution(score_distribution):
+    total = sum(item['count'] for item in score_distribution)
+    rows = []
+    for item in score_distribution:
+        rows.append(
+            '<div style="display:flex;align-items:center;gap:12px;">'
+            f'<span style="font-size:13px;min-width:40px;">{item["rating"]} ★</span>'
+            '<div style="flex:1;background:var(--color-background-secondary);border-radius:6px;height:24px;overflow:hidden;">'
+            f'<div style="width:{item["percent"]:.1f}%;height:24px;background:{item["color"]};display:flex;align-items:center;padding-left:12px;font-size:11px;font-weight:700;color:white;">'
+            f'{item["count"]:,} ratings ({item["percent"]:.1f}%)'
+            '</div></div></div>'
+        )
+    return {
+        'title': f'Score Distribution ({total:,} Ratings)',
+        'total': f'{total:,}',
+        'rows': '\n      '.join(rows),
+    }
 
 def _render_template(template_name, data):
     html = (BASE_DIR / template_name).read_text(encoding='utf-8')
@@ -335,12 +392,17 @@ def _render_template(template_name, data):
         'timing': data['timing'],
         'mentorData': data['mentorData'],
         'summary': data['summary'],
+        'scoreDistribution': data['scoreDistribution'],
     }
     for key, value in json_keys.items():
         html = html.replace(f'{{{{ {key} | tojson | safe }}}}', _json(value))
 
+    score_distribution_html = _render_score_distribution(data['scoreDistribution'])
     scalar_replacements = {
         '{{ summary.total }}': str(data['summary']['total']),
+        '{{ scoreDistribution.title }}': score_distribution_html['title'],
+        '{{ scoreDistribution.total }}': score_distribution_html['total'],
+        '{{ scoreDistribution.rows | safe }}': score_distribution_html['rows'],
         '{{ summary.g10_b + summary.g9_b }}': str(data['summary']['g10_b'] + data['summary']['g9_b']),
         "{{ '%.2f'|format(coreMetrics.institute_avg) }}": f"{data['coreMetrics']['institute_avg']:.2f}",
         "{{ '%.1f'|format(coreMetrics.promoter_rate) }}": f"{data['coreMetrics']['promoter_rate']:.1f}",

@@ -482,7 +482,7 @@
         Deep Analytics
       </div>
     </div>
-    <p class="subtitle">Comprehensive performance metrics for 11 teachers across 9,589 ratings. Every dimension, every batch, quantified.</p>
+    <p class="subtitle">Comprehensive performance metrics for 11 teachers across {{ scoreDistribution.total }} ratings. Every dimension, every batch, quantified.</p>
   </div>
   <div class="nav-links" style="display:flex; gap:8px; margin-top: 4px;">
     <!-- <a href="/report" class="nav-btn">Insight Report</a> -->
@@ -512,13 +512,9 @@
   </div>
 
   <div class="card">
-    <div class="card-title">Score Distribution (9,589 Ratings)</div>
+    <div class="card-title">{{ scoreDistribution.title }}</div>
     <div style="display:grid; gap: 12px;">
-      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;min-width:40px;">5 ★</span><div style="flex:1;background:var(--color-background-secondary);border-radius:6px;height:24px;overflow:hidden;"><div style="width:47.1%;height:24px;background:#059669;display:flex;align-items:center;padding-left:12px;font-size:11px;font-weight:700;color:white;">4,513 ratings (47.1%)</div></div></div>
-      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;min-width:40px;">4 ★</span><div style="flex:1;background:var(--color-background-secondary);border-radius:6px;height:24px;overflow:hidden;"><div style="width:23.8%;height:24px;background:#2563eb;display:flex;align-items:center;padding-left:12px;font-size:11px;font-weight:700;color:white;">2,285 ratings (23.8%)</div></div></div>
-      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;min-width:40px;">3 ★</span><div style="flex:1;background:var(--color-background-secondary);border-radius:6px;height:24px;overflow:hidden;"><div style="width:17.4%;height:24px;background:#64748b;display:flex;align-items:center;padding-left:12px;font-size:11px;font-weight:700;color:white;">1,664 ratings (17.4%)</div></div></div>
-      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;min-width:40px;">2 ★</span><div style="flex:1;background:var(--color-background-secondary);border-radius:6px;height:24px;overflow:hidden;"><div style="width:6.5%;height:24px;background:#d97706;display:flex;align-items:center;padding-left:12px;font-size:11px;font-weight:700;color:white;">620 ratings (6.5%)</div></div></div>
-      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;min-width:40px;">1 ★</span><div style="flex:1;background:var(--color-background-secondary);border-radius:6px;height:24px;overflow:hidden;"><div style="width:5.3%;height:24px;background:#dc2626;display:flex;align-items:center;padding-left:12px;font-size:11px;font-weight:700;color:white;">507 ratings (5.3%)</div></div></div>
+      {{ scoreDistribution.rows | safe }}
     </div>
   </div>
 
